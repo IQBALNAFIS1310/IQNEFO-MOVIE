@@ -36,7 +36,7 @@ export default function SignIn() {
         {message && <pre className="bg-gray-800 text-white p-2 mt-3 rounded text-sm">{message}</pre>}
         <p className="text-center text-sm mt-4">
           Belum punya akun?{" "}
-          <a href="/SignUp" className="text-blue-600 hover:underline">
+          <a href="/signup" className="text-blue-600 hover:underline">
             Daftar
           </a>
         </p>

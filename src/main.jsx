@@ -33,7 +33,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard", // halaman setelah login (opsional)
-        element: <Movie />  // sementara pakai Movie dulu
+        element: <Movie />
       }
     ]
   }
