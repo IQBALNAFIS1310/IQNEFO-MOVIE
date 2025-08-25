@@ -1,4 +1,4 @@
-const BASE_URL = "http://basic-1.alstore.space:25586"; 
+const BASE_URL = "https://users-akses-iqnefo-movie.iqbalnafis487.workers.dev"; 
 
 export async function apiRegister(user) {
   const res = await fetch(`${BASE_URL}/register`, {
