@@ -6,8 +6,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import App from './App.jsx'
 import SignIn from './pages/SignIn.jsx'
 import SignUp from './pages/SignUp.jsx'
-import Movie from './pages/Movie.jsx'
+import Dashboard from './pages/dashboard.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import Detail from './pages/Detail.jsx'
 
 // Definisi routing
 const router = createBrowserRouter([
@@ -28,13 +29,18 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "/",        // default konten dari App
-        element: <Movie />
+        path: "/dashboard",
+        element: <Dashboard />
       },
       {
-        path: "/dashboard", // halaman setelah login (opsional)
-        element: <Movie />
+        path: "/",
+        element: <Dashboard />
+      },
+      {
+        path:"/detail/:id",
+        element : <Detail/>
       }
+
     ]
   }
 ])

@@ -1,35 +1,25 @@
-  import { Outlet } from "react-router-dom";
-  import Header from "./components/Header";
-  import Footer from "./components/Footer";
-  import { useState, useEffect, createContext } from "react";
+import { Outlet } from "react-router-dom";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import { useState, useEffect, createContext } from "react";
 
-  export const CartContext = createContext();
+export const CartContext = createContext();
 
-  export default function App() {
-    const savedCart = localStorage.getItem("keranjang");
-    const [keranjang, setKeranjang] = useState(
-      savedCart ? JSON.parse(savedCart) : []
-    );
+export default function App() {
+  return (
+    <CartContext.Provider>
+      <div className="flex min-h-screen flex-col">
+        {/* Header */}
+        <Header />
 
-    // Simpan ke localStorage setiap kali keranjang berubah
-    useEffect(() => {
-      localStorage.setItem("keranjang", JSON.stringify(keranjang));
-    }, [keranjang]);
+        {/* Konten halaman (akan berubah sesuai route) */}
+        <main className="flex-1">
+          <Outlet />
+        </main>
 
-    return (
-      <CartContext.Provider value={{ keranjang, setKeranjang }}>
-        <div className="flex min-h-screen flex-col">
-          {/* Header */}
-          <Header />
-
-          {/* Konten halaman (akan berubah sesuai route) */}
-          <main className="flex-1">
-            <Outlet />
-          </main>
-
-          {/* Footer */}
-          <Footer />
-        </div>
-      </CartContext.Provider>
-    );
-  }
+        {/* Footer */}
+        <Footer />
+      </div>
+    </CartContext.Provider>
+  );
+}
