@@ -1,5 +1,5 @@
-// const USR_API = "https://users-akses-iqnefo-movie.iqbalnafis487.workers.dev";
-const USR_API = "http://localhost:3000";
+const USR_API = "https://users-akses-iqnefo-movie.iqbalnafis487.workers.dev";
+// const USR_API = "http://localhost:3000";
 const MOVIE_API ="";
 const TRAILER_API = "";
 
