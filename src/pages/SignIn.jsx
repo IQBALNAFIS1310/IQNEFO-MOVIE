@@ -28,7 +28,7 @@ export default function SignIn() {
           email: res.user.email,
         })
       );
-      navigate("/dashboard");
+      navigate("/home");
     }
   };
 
