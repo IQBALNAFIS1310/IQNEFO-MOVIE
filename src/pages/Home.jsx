@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const apiKey = "20294adf51756709c0db49a1d6218100";
 const baseUrl = "https://api.themoviedb.org/3";
 
-export default function Dashboard() {
+export default function Home() {
     const [popular, setPopular] = useState([]);
     const [topRated, setTopRated] = useState([]);
     const [upcoming, setUpcoming] = useState([]);

@@ -6,9 +6,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import App from './App.jsx'
 import SignIn from './pages/SignIn.jsx'
 import SignUp from './pages/SignUp.jsx'
-import Dashboard from './pages/dashboard.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Detail from './pages/Detail.jsx'
+import Home from './pages/Home.jsx'
 
 // Definisi routing
 const router = createBrowserRouter([
@@ -29,12 +29,12 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "/dashboard",
-        element: <Dashboard />
+        path: "/home",
+        element: <Home />
       },
       {
         path: "/",
-        element: <Dashboard />
+        element: <Home />
       },
       {
         path:"/detail/:id",
