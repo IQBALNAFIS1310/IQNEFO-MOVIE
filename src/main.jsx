@@ -9,6 +9,7 @@ import SignUp from './pages/SignUp.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Detail from './pages/Detail.jsx'
 import Home from './pages/Home.jsx'
+import Searching from './pages/Searching.jsx'
 
 // Definisi routing
 const router = createBrowserRouter([
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path:"/detail/:id",
         element : <Detail/>
+      },
+      {
+        path:"/searching",
+        element:<Searching/>
       }
 
     ]

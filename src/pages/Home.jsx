@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const apiKey = "20294adf51756709c0db49a1d6218100";
 const baseUrl = "https://api.themoviedb.org/3";
@@ -13,23 +13,33 @@ export default function Home() {
 
     // Fetch Popular Movies
     useEffect(() => {
-        fetch(`${baseUrl}/movie/popular?api_key=${apiKey}&language=en-US&page=1`)
+        fetch(`${baseUrl}/movie/popular?api_key=${apiKey}&language=en-US&page=1&include_adult=false`)
             .then((res) => res.json())
-            .then((data) => setPopular(data.results || []));
+            .then((data) => {
+                const filtered = (data.results || []).filter((m) => !m.adult);
+                setPopular(filtered);
+            });
     }, []);
+
 
     // Fetch Top Rated Movies
     useEffect(() => {
-        fetch(`${baseUrl}/movie/top_rated?api_key=${apiKey}&language=en-US&page=1`)
+        fetch(`${baseUrl}/movie/top_rated?api_key=${apiKey}&language=en-US&page=1&include_adult=false`)
             .then((res) => res.json())
-            .then((data) => setTopRated(data.results || []));
+            .then((data) => {
+                const filtered = (data.results || []).filter((m) => !m.adult);
+                setTopRated(filtered);
+            });
     }, []);
 
     // Fetch Upcoming Movies (ambil 5 untuk slider)
     useEffect(() => {
-        fetch(`${baseUrl}/movie/upcoming?api_key=${apiKey}&language=en-US&page=1`)
+        fetch(`${baseUrl}/movie/upcoming?api_key=${apiKey}&language=en-US&page=1&include_adult=false`)
             .then((res) => res.json())
-            .then((data) => setUpcoming((data.results || []).slice(0, 5)));
+            .then((data) => {
+                const filtered = (data.results || []).filter((m) => !m.adult);
+                setUpcoming(filtered.slice(0, 5));
+            });
     }, []);
 
     // Fetch Movies by Genre
@@ -80,7 +90,7 @@ export default function Home() {
                             className="w-full h-[60vh] flex-shrink-0 relative bg-cover bg-center"
                             style={{
                                 backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
-                                height:`100%`
+                                height: `100%`
                             }}
                         >
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
