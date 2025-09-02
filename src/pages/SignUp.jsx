@@ -14,12 +14,42 @@ export default function SignUp() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const user = { id: Date.now(), ...form };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Regex rules
+  const usernameRegex = /^[a-z0-9]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordRegex = /^\S+$/;
+
+  // Validasi username
+  if (!usernameRegex.test(form.username)) {
+    setMessage("❌ Username hanya boleh huruf kecil & angka, tanpa spasi/simbol!");
+    return;
+  }
+
+  // Validasi email
+  if (!emailRegex.test(form.email)) {
+    setMessage("❌ Email tidak valid!");
+    return;
+  }
+
+  // Validasi password
+  if (!passwordRegex.test(form.password)) {
+    setMessage("❌ Password tidak boleh mengandung spasi!");
+    return;
+  }
+
+  // Kalau semua valid → kirim ke API
+  const user = { id: Date.now(), ...form };
+  try {
     const res = await apiRegister(user);
-    setMessage(JSON.stringify(res, null, 2));
-  };
+    setMessage("✅ Berhasil registrasi:\n" + JSON.stringify(res, null, 2));
+  } catch (err) {
+    setMessage("❌ Gagal registrasi: " + err.message);
+  }
+};
+
 
   const [backgrounds, setBackgrounds] = useState([]);
   const [index, setIndex] = useState(0);

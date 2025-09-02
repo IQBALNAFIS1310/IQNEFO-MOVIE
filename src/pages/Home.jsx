@@ -38,7 +38,7 @@ export default function Home() {
             .then((res) => res.json())
             .then((data) => {
                 const filtered = (data.results || []).filter((m) => !m.adult);
-                setUpcoming(filtered.slice(0, 5));
+                setUpcoming(filtered.slice(1, 6));
             });
     }, []);
 

@@ -20,8 +20,3 @@ export async function apiLogin(credentials) {
   });
   return res.json();
 }
-
-// export async function apiGetUsers(apiKey) {
-//   const res = await fetch(`${USR_API}/users?apikey=${apiKey}`);
-//   return res.json();
-// }
