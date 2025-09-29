@@ -37,3 +37,4 @@ src/
 ├── App.jsx # Routing utama aplikasi
 ├── main.jsx # Entry point React
 ├── index.css # Global styles (Tailwind CSS)
+|__ vercel.json

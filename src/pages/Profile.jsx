@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
+import { apiGetUser, apiUpdateUser, apiDeleteUser, apiLogin } from "../utils/api.js";
 
 export default function Profile() {
   const storedUser = localStorage.getItem("informasiakun");
   const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-
   const userId = parsedUser?.id;
-
-  const API_URL = `https://users-akses-iqnefo-movie.iqbalnafis487.workers.dev/users/${userId}`;
 
   const [user, setUser] = useState(null);
   const [form, setForm] = useState({ username: "", email: "", name: "", password: "" });
@@ -17,91 +15,67 @@ export default function Profile() {
 
   useEffect(() => {
     if (!userId) return;
-    fetch(API_URL)
-      .then((res) => res.json())
+    apiGetUser(userId)
       .then((data) => {
         setUser(data);
-        setForm({
-          username: data.username || "",
-          email: data.email || "",
-          name: data.name || "",
-          password: data.password || "",
-        });
+        setForm({ username: data.username, email: data.email, name: data.name, password: "" });
       })
       .catch((err) => console.error("Fetch error:", err));
-  }, [API_URL, userId]);
+  }, [userId]);
+
+  // 🔹 Validasi password via login
+  const verifyPassword = async () => {
+    if (!parsedUser?.username) return { error: "Data login tidak valid" };
+    return await apiLogin({ username: parsedUser.username, password: confirmPassword });
+  };
 
   // 🔹 Update Profile
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    // Validasi username
-    const usernameRegex = /^[a-z0-9]+$/;
-    if (!usernameRegex.test(form.username)) {
-      setConfirmError("Username hanya boleh huruf kecil & angka, tanpa spasi/simbol!");
+    const loginRes = await verifyPassword();
+    if (loginRes.error) {
+      setConfirmError("Password salah");
       return;
     }
 
-    // Validasi email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) {
-      setConfirmError("Email tidak valid!");
+    const updated = await apiUpdateUser(userId, form);
+    if (updated.error) {
+      setConfirmError(updated.error);
       return;
     }
 
-    // Validasi password
-    const passwordRegex = /^\S+$/;
-    if (!passwordRegex.test(form.password)) {
-      setConfirmError("Password tidak boleh mengandung spasi!");
-      return;
-    }
-
-    // Validasi konfirmasi password
-    if (confirmPassword !== user.password) {
-      setConfirmError("Password salah, tidak bisa update!");
-      return;
-    }
-
-    await fetch(API_URL, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-
-    setUser({ ...user, ...form });
+    setUser(updated.user || user);
     setEditing(false);
     setConfirmPassword("");
     setConfirmError("");
   };
 
-  // 🔹 Hapus Akun
+  // 🔹 Delete Account
   const handleDelete = async () => {
-    if (confirmPassword !== user.password) {
-      setConfirmError("Password salah, tidak bisa hapus akun!");
+    const loginRes = await verifyPassword();
+    if (loginRes.error) {
+      setConfirmError("Password salah");
       return;
     }
 
-    await fetch(API_URL, { method: "DELETE" });
+    const deleted = await apiDeleteUser(userId);
+    if (deleted.error) {
+      setConfirmError(deleted.error);
+      return;
+    }
 
-    // hapus localStorage biar logout otomatis
     localStorage.removeItem("informasiakun");
-    window.location.href = "/signin"; // redirect ke halaman utama/login
+    window.location.href = "/signin";
   };
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="text-gray-300 text-xl">Loading...</div>
-      </div>
-    );
-  }
+  if (!user) return <p className="text-white">Loading...</p>;
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-900 px-4">
       <div className="w-full max-w-2xl bg-gray-800 shadow-2xl rounded-3xl p-10 text-gray-100">
         {!editing ? (
           <>
-            {/* Avatar */}
             <div className="flex flex-col items-center">
               <img
                 src={`https://ui-avatars.com/api/?name=${user.name}&background=random&color=fff&size=128`}
@@ -112,7 +86,6 @@ export default function Profile() {
               <p className="text-gray-400 text-lg">@{user.username}</p>
             </div>
 
-            {/* Info */}
             <div className="mt-10 space-y-5 text-lg">
               <div className="flex justify-between border-b border-gray-700 pb-2">
                 <span className="font-semibold text-gray-300">Email</span>
@@ -124,111 +97,83 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Action */}
             <div className="mt-10 flex gap-4 justify-center">
-              <button
-                onClick={() => setEditing(true)}
-                className="px-8 py-3 bg-blue-600 text-white text-lg rounded-xl shadow-lg hover:bg-blue-700 transition"
-              >
+              <button onClick={() => setEditing(true)} className="px-8 py-3 bg-blue-600 rounded-xl hover:bg-blue-700">
                 Edit Profile
               </button>
-              <button
-                onClick={() => setDeleting(true)}
-                className="px-8 py-3 bg-red-600 text-white text-lg rounded-xl shadow-lg hover:bg-red-700 transition"
-              >
+              <button onClick={() => setDeleting(true)} className="px-8 py-3 bg-red-600 rounded-xl hover:bg-red-700">
                 Delete Account
               </button>
             </div>
           </>
         ) : (
-          <>
-            <h1 className="text-2xl font-bold mb-6 text-center">Edit Profile</h1>
-            <form onSubmit={handleUpdate} className="space-y-6">
-              <input
-                type="text"
-                placeholder="Username"
-                value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
-                className="w-full border border-gray-600 rounded-xl px-4 py-3 bg-gray-700 text-white focus:ring-2 focus:ring-blue-400"
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full border border-gray-600 rounded-xl px-4 py-3 bg-gray-700 text-white focus:ring-2 focus:ring-blue-400"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full border border-gray-600 rounded-xl px-4 py-3 bg-gray-700 text-white focus:ring-2 focus:ring-blue-400"
-              />
-              <input
-                type="password"
-                placeholder="New Password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full border border-gray-600 rounded-xl px-4 py-3 bg-gray-700 text-white focus:ring-2 focus:ring-blue-400"
-                required
-              />
+          <form onSubmit={handleUpdate} className="space-y-6">
+            <input
+              type="text"
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              placeholder="Username"
+              className="w-full px-4 py-3 rounded-xl bg-gray-700"
+            />
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="Email"
+              className="w-full px-4 py-3 rounded-xl bg-gray-700"
+            />
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Full Name"
+              className="w-full px-4 py-3 rounded-xl bg-gray-700"
+            />
+            <input
+              type="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              placeholder="New Password"
+              className="w-full px-4 py-3 rounded-xl bg-gray-700"
+            />
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm Current Password"
+              className="w-full px-4 py-3 rounded-xl bg-gray-700"
+              required
+            />
+            {confirmError && <p className="text-red-400">{confirmError}</p>}
 
-              {/* Confirm Password */}
+            <div className="flex gap-4 justify-center">
+              <button type="submit" className="px-8 py-3 bg-green-600 rounded-xl hover:bg-green-700">
+                Save
+              </button>
+              <button type="button" onClick={() => setEditing(false)} className="px-8 py-3 bg-gray-600 rounded-xl">
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Delete Modal */}
+        {deleting && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
+            <div className="bg-gray-800 p-8 rounded-2xl w-full max-w-md">
+              <h2 className="text-xl font-bold text-red-400 text-center">Delete Account</h2>
+              <p className="text-gray-300 text-center mb-4">Masukkan password untuk hapus akun</p>
               <input
                 type="password"
-                placeholder="Confirm your current password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full border border-gray-600 rounded-xl px-4 py-3 bg-gray-700 text-white focus:ring-2 focus:ring-red-400"
-                required
+                placeholder="Confirm Password"
+                className="w-full px-4 py-3 rounded-xl bg-gray-700 mb-4"
               />
               {confirmError && <p className="text-red-400 text-sm">{confirmError}</p>}
 
-              <div className="flex gap-4 justify-center">
-                <button
-                  type="submit"
-                  className="px-8 py-3 bg-green-600 text-lg text-white rounded-xl shadow-lg hover:bg-green-700 transition"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditing(false)}
-                  className="px-8 py-3 bg-gray-600 text-lg text-white rounded-xl shadow-lg hover:bg-gray-700 transition"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </>
-        )}
-
-        {/* Delete confirmation modal */}
-        {deleting && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
-            <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4 text-center text-red-400">Delete Account</h2>
-              <p className="mb-4 text-gray-300 text-center">
-                Masukkan password untuk menghapus akun ini. <br />
-                <span className="text-red-500 font-semibold">Tindakan ini tidak bisa dibatalkan!</span>
-              </p>
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full border border-gray-600 rounded-xl px-4 py-3 bg-gray-700 text-white mb-4"
-              />
-              {confirmError && <p className="text-red-400 text-sm mb-4">{confirmError}</p>}
-
-              <div className="flex justify-between gap-4">
-                <button
-                  onClick={handleDelete}
-                  className="w-full px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700"
-                >
+              <div className="flex gap-4">
+                <button onClick={handleDelete} className="w-full px-6 py-3 bg-red-600 rounded-xl hover:bg-red-700">
                   Delete
                 </button>
                 <button
@@ -237,7 +182,7 @@ export default function Profile() {
                     setConfirmPassword("");
                     setConfirmError("");
                   }}
-                  className="w-full px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700"
+                  className="w-full px-6 py-3 bg-gray-600 rounded-xl hover:bg-gray-700"
                 >
                   Cancel
                 </button>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ ganti Navigate jadi useNavigate
 import { apiRegister } from "../utils/api";
 
 export default function SignUp() {
@@ -9,47 +10,49 @@ export default function SignUp() {
     name: "",
   });
   const [message, setMessage] = useState("");
+  const navigate = useNavigate(); // ✅ hook untuk pindah halaman
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // Regex rules
-  const usernameRegex = /^[a-z0-9]+$/;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex = /^\S+$/;
+    // Regex rules
+    const usernameRegex = /^[a-z0-9]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^\S+$/;
 
-  // Validasi username
-  if (!usernameRegex.test(form.username)) {
-    setMessage("❌ Username hanya boleh huruf kecil & angka, tanpa spasi/simbol!");
-    return;
-  }
+    // Validasi username
+    if (!usernameRegex.test(form.username)) {
+      setMessage("❌ Username hanya boleh huruf kecil & angka, tanpa spasi/simbol!");
+      return;
+    }
 
-  // Validasi email
-  if (!emailRegex.test(form.email)) {
-    setMessage("❌ Email tidak valid!");
-    return;
-  }
+    // Validasi email
+    if (!emailRegex.test(form.email)) {
+      setMessage("❌ Email tidak valid!");
+      return;
+    }
 
-  // Validasi password
-  if (!passwordRegex.test(form.password)) {
-    setMessage("❌ Password tidak boleh mengandung spasi!");
-    return;
-  }
+    // Validasi password
+    if (!passwordRegex.test(form.password)) {
+      setMessage("❌ Password tidak boleh mengandung spasi!");
+      return;
+    }
 
-  // Kalau semua valid → kirim ke API
-  const user = { id: Date.now(), ...form };
-  try {
-    const res = await apiRegister(user);
-    setMessage("✅ Berhasil registrasi:\n" + JSON.stringify(res, null, 2));
-  } catch (err) {
-    setMessage("❌ Gagal registrasi: " + err.message);
-  }
-};
+    try {
+      // kirim form langsung, tanpa id
+      const res = await apiRegister(form);
+      setMessage("✅ Berhasil registrasi:\n");
 
+      // redirect ke signin
+      setTimeout(() => navigate("/signin"), 1000);
+    } catch (err) {
+      setMessage("❌ Gagal registrasi: ");
+    }
+  };
 
   const [backgrounds, setBackgrounds] = useState([]);
   const [index, setIndex] = useState(0);
@@ -64,9 +67,7 @@ const handleSubmit = async (e) => {
         const data = await res.json();
         const movies = data.results.filter((m) => m.backdrop_path);
         setBackgrounds(
-          movies.map(
-            (m) => `https://image.tmdb.org/t/p/original${m.backdrop_path}`
-          )
+          movies.map((m) => `https://image.tmdb.org/t/p/original${m.backdrop_path}`)
         );
       } catch (err) {
         console.error("Error fetching upcoming:", err);

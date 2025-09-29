@@ -1,13 +1,15 @@
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { useState, useEffect, createContext } from "react";
+import { useState, createContext } from "react";
 
 export const CartContext = createContext();
 
 export default function App() {
+  const [cart, setCart] = useState([]);
+
   return (
-    <CartContext.Provider>
+    <CartContext.Provider value={{ cart, setCart }}>
       <div className="flex min-h-screen flex-col">
         {/* Header */}
         <Header />
