@@ -45,10 +45,11 @@ export default function SignUp() {
     try {
       // kirim form langsung, tanpa id
       const res = await apiRegister(form);
-      setMessage("✅ Berhasil registrasi:\n");
-
-      // redirect ke signin
-      setTimeout(() => navigate("/signin"), 1000);
+      if(res){
+        setMessage("✅ Berhasil registrasi:\n");
+        // redirect ke signin
+        setTimeout(() => navigate("/signin"), 1000);
+      }
     } catch (err) {
       setMessage("❌ Gagal registrasi: ");
     }

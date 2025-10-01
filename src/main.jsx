@@ -24,6 +24,10 @@ const router = createBrowserRouter([
   {
     path: "/signup",      // halaman register
     element: <SignUp />
+  }, 
+  {
+    path: "/",
+    element: <Home />
   },
   {
     path: "/",            // halaman utama
@@ -37,10 +41,7 @@ const router = createBrowserRouter([
         path: "/home",
         element: <Home />
       },
-      {
-        path: "/",
-        element: <Home />
-      },
+
       {
         path: "/detail/:id",
         element: <Detail />

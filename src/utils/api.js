@@ -1,6 +1,4 @@
 const USR_API = "https://iqnefo-api-users.vercel.app";
-const MOVIE_API = "";
-const TRAILER_API = "";
 
 // --- AUTH ---
 export async function apiRegister(user) {
