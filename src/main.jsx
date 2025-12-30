@@ -14,20 +14,26 @@ import Popular from './pages/Popular.jsx'
 import TopRated from './pages/TopRated.jsx'
 import UpComing from './pages/UpComing.jsx'
 import Profile from './pages/Profile.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import InitialRedirect from './components/InitialRedirect.jsx'
 
 // Definisi routing
 const router = createBrowserRouter([
   {
-    path: "/signin",      // halaman login
+    path: "/",
+    element: <InitialRedirect />   // ⬅️ penentu arah awal
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />         // ⬅️ halaman awal sebelum login
+  },
+  {
+    path: "/signin",
     element: <SignIn />
   },
   {
-    path: "/signup",      // halaman register
+    path: "/signup",
     element: <SignUp />
-  }, 
-  {
-    path: "/",
-    element: <Home />
   },
   {
     path: "/",            // halaman utama
